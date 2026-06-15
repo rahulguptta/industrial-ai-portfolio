@@ -1,0 +1,2 @@
+# industrial-ai-portfolio
+Industrial AI portfolio showcasing real-world machine learning applications in petrochemical and manufacturing processes, including predictive maintenance, digital twin systems, and sustainability analytics.
