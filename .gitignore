@@ -1,0 +1,16 @@
+# Virtual Environment
+env/
+venv/
+.venv/
+
+# Python Cache
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+industrial-ai-toolkit/sessions.db
+
+# OS files
+.DS_Store
+Thumbs.db

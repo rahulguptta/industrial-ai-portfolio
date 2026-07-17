@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Industrial AI Toolkit</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark brand-mark-large" id="brand-mark">⌁</span>
+        <span class="brand-text brand-text-large" id="brand-text">Industrial AI Toolkit</span>
+      </div>
+      <div class="brand-sub">Soft Sensor Development Console</div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <div class="choice-grid">
+      <div class="choice-card" id="start-new-card">
+        <span class="choice-icon">＋</span>
+        <h2 class="choice-title">Start a new project</h2>
+        <p class="choice-desc">Upload a fresh dataset and begin building a soft sensor from scratch.</p>
+      </div>
+      <div class="choice-card" id="resume-card">
+        <span class="choice-icon">↻</span>
+        <h2 class="choice-title">Resume a project</h2>
+        <p class="choice-desc">Pick up an existing session exactly where you left off.</p>
+      </div>
+    </div>
+
+    <div class="welcome-box" id="welcome-box" hidden>
+      <h2 class="welcome-title">Welcome, <span id="welcome-name"></span> 👋</h2>
+      <p class="welcome-desc">Project "<span id="welcome-project"></span>" — choose what you'd like to build.</p>
+      <div class="type-grid">
+        <div class="type-card" id="type-soft-sensor">
+          <span class="type-icon">⚙</span>
+          <h3 class="type-title">Soft Sensor</h3>
+          <p class="type-desc">Estimate a hard-to-measure variable from related process readings.</p>
+        </div>
+        <div class="type-card" id="type-classifier">
+          <span class="type-icon">◧</span>
+          <h3 class="type-title">Classifier</h3>
+          <p class="type-desc">Sort observations into categories or detect specific conditions.</p>
+        </div>
+        <div class="type-card" id="type-forecasting">
+          <span class="type-icon">↗</span>
+          <h3 class="type-title">Forecasting</h3>
+          <p class="type-desc">Predict future values based on historical time-series data.</p>
+        </div>
+        <div class="type-card" id="type-clustering">
+          <span class="type-icon">⬡</span>
+          <h3 class="type-title">Clustering</h3>
+          <p class="type-desc">Discover natural groupings or patterns without labeled outcomes.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="new-project-modal" hidden>
+      <div class="modal-box">
+        <h2 class="modal-title">Start a new project</h2>
+        <p class="modal-desc">Tell us a little about this project before we begin.</p>
+        <label class="modal-label" for="input-name">Your name</label>
+        <input type="text" class="modal-input" id="input-name" placeholder="e.g. Priya Sharma">
+        <label class="modal-label" for="input-project-name">Project name</label>
+        <input type="text" class="modal-input" id="input-project-name" placeholder="e.g. Reactor Quality Sensor">
+        <div class="modal-actions">
+          <button class="btn-secondary" id="modal-cancel-btn">Cancel</button>
+          <button class="btn-primary" id="modal-submit-btn">Submit</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="resume-modal" hidden>
+      <div class="modal-box">
+        <h2 class="modal-title">Resume a project</h2>
+        <p class="modal-desc">Enter your project ID to pick up where you left off.</p>
+        <label class="modal-label" for="resume-project-id-input">Project ID</label>
+        <input type="text" class="modal-input" id="resume-project-id-input" placeholder="e.g. rahul-mfi-v0">
+        <div class="modal-actions">
+          <button class="btn-secondary" id="resume-cancel-btn">Cancel</button>
+          <button class="btn-primary" id="resume-submit-btn">Resume</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="workspace" id="workspace" hidden>
+    <div class="workspace-topbar">
+      <div class="workspace-logo">⌁</div>
+      <div class="workspace-project-center">
+        <div class="workspace-project-name" id="ws-project-name">Project Name</div>
+        <div class="workspace-project-id" id="ws-project-id" hidden>—</div>
+      </div>
+      <div class="workspace-right">
+        <button class="btn-save" id="save-btn" hidden>💾 Save</button>
+        <div class="workspace-user-name" id="ws-user-name">User Name</div>
+      </div>
+    </div>
+
+    <div class="workspace-body">
+
+      <nav class="sidebar">
+        <div class="sidebar-step active" id="step-upload">Upload</div>
+        <div class="sidebar-step" id="step-basic-info">Basic Info</div>
+        <div class="sidebar-step" id="step-visualization">Visualization</div>
+        <div class="sidebar-step" id="step-data-analysis">Data Analysis</div>
+        <div class="sidebar-step" id="step-feature-selection">Feature Selection</div>
+        <div class="sidebar-step" id="step-model-training">Model Training</div>
+        <div class="sidebar-step" id="step-results">Results</div>
+      </nav>
+
+      <main class="workspace-main" id="workspace-main">
+
+        <div id="panel-upload">
+          <h2 class="ws-panel-title">Upload Data</h2>
+          <p class="ws-panel-desc">Choose your file format to get started.</p>
+          <div class="upload-format-grid">
+            <div class="upload-format-card" id="format-csv">
+              <span class="upload-format-icon">⬡</span>
+              <h3 class="upload-format-title">CSV</h3>
+              <p class="upload-format-desc">Comma-separated values. Single table, ready to use.</p>
+            </div>
+            <div class="upload-format-card" id="format-excel">
+              <span class="upload-format-icon">▦</span>
+              <h3 class="upload-format-title">Excel</h3>
+              <p class="upload-format-desc">Supports .xlsx files. You'll be asked to pick a sheet if multiple exist.</p>
+            </div>
+          </div>
+          <input type="file" id="csv-file-input" accept=".csv" hidden>
+          <input type="file" id="excel-file-input" accept=".xlsx,.xls" hidden>
+          <div class="sheet-selector" id="sheet-selector" hidden>
+            <p class="sheet-selector-label">This Excel file has multiple sheets. Which one contains your data?</p>
+            <select class="sheet-select" id="sheet-select"></select>
+            <button class="btn-primary" id="sheet-confirm-btn">Use this sheet</button>
+          </div>
+          <div class="upload-status" id="upload-status" hidden>
+            <span id="upload-status-text"></span>
+          </div>
+          <div id="upload-submit-area" hidden>
+            <button class="btn-primary" id="upload-submit-btn">Submit</button>
+          </div>
+        </div>
+
+        <div id="panel-basic-info" hidden>
+          <h2 class="ws-panel-title">Basic Info</h2>
+          <div class="info-grid">
+            <div class="info-box">
+              <div class="info-row"><span class="info-label">Number of rows</span><span class="info-value" id="bi-rows">—</span></div>
+              <div class="info-row"><span class="info-label">Number of features</span><span class="info-value" id="bi-features">—</span></div>
+              <div class="info-row"><span class="info-label">Features with missing data</span><span class="info-value" id="bi-missing-cols">—</span></div>
+            </div>
+            <div class="info-box">
+              <div class="info-row"><span class="info-label">Numeric features</span><span class="info-value" id="bi-numeric">—</span></div>
+              <div class="info-row"><span class="info-label">Categorical features</span><span class="info-value" id="bi-categorical">—</span></div>
+              <div class="info-row"><span class="info-label">Time attributes</span><span class="info-value" id="bi-time">—</span></div>
+            </div>
+          </div>
+          <div class="special-attrs" id="special-attrs-box">
+            <h3 class="special-attrs-title">Special Attributes</h3>
+            <div id="special-pseudo-cat"></div>
+            <div id="special-time-cols"></div>
+            <div id="special-high-missing"></div>
+          </div>
+          <table class="data-table" id="bi-table">
+            <thead>
+              <tr>
+                <th>Attribute</th>
+                <th>Min</th>
+                <th>Max</th>
+                <th>Avg</th>
+                <th>Missing</th>
+                <th>
+                  Type
+                  <select class="type-dropdown" id="type-filter-dropdown">
+                    <option value="all">All</option>
+                    <option value="numeric">Numeric</option>
+                    <option value="categorical">Categorical</option>
+                    <option value="time">Time</option>
+                  </select>
+                </th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bi-table-body"></tbody>
+          </table>
+          <div class="panel-actions">
+            <button class="btn-primary" id="proceed-btn">Proceed</button>
+          </div>
+        </div>
+
+        <div id="panel-visualization" hidden>
+
+          <!-- Control bar -->
+          <div class="viz-control-bar">
+            <select id="viz-feature-type" class="viz-select">
+              <option value="numeric" selected>Numeric</option>
+              <option value="categorical">Categorical</option>
+            </select>
+            <select id="viz-feature" class="viz-select"><option value="">— select feature —</option></select>
+            <div class="viz-tab-label">Visualization</div>
+            <select id="viz-second-feature" class="viz-select"><option value="">— second feature —</option></select>
+          </div>
+
+          <!-- Numeric grid -->
+          <div id="viz-numeric-grid" class="viz-grid">
+
+            <!-- Card A: Distribution + Stats -->
+            <div class="viz-card">
+              <div class="viz-card-title">Distribution Plot</div>
+              <div id="viz-histogram" class="viz-chart-area"></div>
+              <div id="viz-stats-table" class="viz-stats-table"></div>
+            </div>
+
+            <!-- Card B: Dual Y-axis overlay plot -->
+            <div class="viz-card">
+              <div class="viz-card-title">Both Features</div>
+              <div id="viz-dual-plot" class="viz-chart-area"></div>
+              <div id="viz-dual-hint" class="viz-card-hint">Both features on y axis. Time on x axis when time data is present.</div>
+            </div>
+
+            <!-- Card C: Scatter & Line -->
+            <div class="viz-card">
+              <div class="viz-card-title">Scatter &amp; Line Plot</div>
+              <div class="viz-toggle-row">
+                <label class="viz-toggle-label"><input type="checkbox" id="viz-show-scatter" checked> Scatter</label>
+                <label class="viz-toggle-label"><input type="checkbox" id="viz-show-line" checked> Trend line</label>
+              </div>
+              <div id="viz-scatter-plot" class="viz-chart-area"></div>
+            </div>
+
+            <!-- Card D: Correlation -->
+            <div class="viz-card">
+              <div class="viz-card-title">Feature vs Target</div>
+              <div id="viz-corr-plot" class="viz-chart-area"></div>
+              <div id="viz-corr-stats" class="viz-corr-stats"></div>
+            </div>
+
+          </div>
+
+          <!-- Next Step -->
+          <div class="panel-actions" style="margin-top: 28px;">
+            <button class="btn-primary" id="viz-next-btn">Next Step</button>
+          </div>
+
+        </div>
+
+        <div id="panel-data-analysis" hidden>
+          <h2 class="ws-panel-title">Data Analysis</h2>
+          <p class="ws-panel-desc">Coming soon — data analysis tools will appear here.</p>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+<script src="app.js"></script>
+</body>
+</html>
